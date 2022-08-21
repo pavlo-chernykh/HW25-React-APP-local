@@ -3,66 +3,58 @@ import TodoHeader from "./components/TodoHeader.js";
 import TodoToggleAll from "./components/TodoToggleAll";
 import TodoFooter from "./components/TodoFooter";
 import TodoList from "./components/TodoList";
+import { addTodo, clearCompletedTodos, filterTodos, removeTodo, toggleTodo, toggleTodos, updateTodo } from './functions'
+import { useState } from "react";
 // import { useState } from "react";
+const initialFilter = 'all'; // 'active', 'completed
+export default function App({initialTodos}) {
+  const [filter, setFilter] = useState(initialFilter);
+  const [todos, setTodos] = useState(initialTodos);
+  // const [state, setState] = useState({
+  //   ...todos
+  // })
 
-export default function App(props) {
+  
 
-  // const [completed, setComplete] = useState(false);
-
-  // function createTodo(title) {
-  //   return { id: Date.now(), title, completed: false }
-  // }
-
-  // function addTodo(todos, title) {
-  //   return [...todos, createTodo(title)];
-  // }
-
-  // function removeTodo(todos, id) {
-  //   return todos.filter((todo) => todo.id !== id);
-  // }
-
-  // function toggleTodo(todos, id) {
-  //   return todos.map((todo) => {
-  //     if (todo.id === id) {
-  //       return { ...todo, completed: !todo.completed }
-  //     }
-  //     return todo;
-  //   })
-  // }
-
-  // function toggleTodos(todos, completed) {
-  //   return todos.map((todo) => ({ ...todo, completed}));
-  // }
-
-  // function clearCompletedTodos(todos) {
-  //   return todos.filter((todo) => !todo.completed)
-  // }
-
-  // function updateTodo(todos, id, todo) {
-  //   return todos.map((eachTodo) => {
-  //     if (eachTodo.id === id) {
-  //       return { ...eachTodo, ...todo};
-  //     }
-  //     return eachTodo;
-  //   })
-  // }
-  const filter = 'all'; // 'active', 'completed
+  const filteredTodos = filterTodos(todos, filter);
 
   return (
     <section className="todoapp">
-      <TodoHeader />
+      <TodoHeader 
+        addTodo={(title) => {
+          setTodos(addTodo(todos, title));
+        }}
+      />
       <section className="main">
-        <TodoToggleAll />
+        <TodoToggleAll 
+          toggleAll={(completed) => {
+            setTodos(toggleTodos(todos, completed))
+          }}
+          todos={todos}
+        />
         <TodoList 
-          todos={props.todos}
-          filter={filter}
+          todos={filteredTodos}
+          toggleTodo={(id) => {
+            setTodos(toggleTodo(todos, id));
+          }}
+          removeTodo={(id) => {
+            setTodos(removeTodo(todos, id));
+          }}
+          updateTodo={(id, todo) => {
+            setTodos(updateTodo(todos, id, todo));
+          }}
+          
         />
       </section>
       <TodoFooter
-        todos={props.todos}
+        todos={filteredTodos}
         filter={filter}
-        // completed={completed}
-        // toggleComplete={item => setComplete(item)}
+        updateFilter={(filter) => {
+          setFilter(filter);
+        }}
+        clearCompleted={() => {
+          setTodos(clearCompletedTodos(todos))
+        }}
       />
     </section>
   );
